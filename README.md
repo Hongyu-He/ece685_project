@@ -4,3 +4,5 @@ This is the repository for ECE685 project: Collaborative Learning of Medical Ima
 ## Dataset
 
 Dataset used in this project: [Chest X-Ray Images (Pneumonia)](https://www.kaggle.com/paultimothymooney/chest-xray-pneumonia)
+
+some changes
