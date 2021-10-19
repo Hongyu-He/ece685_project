@@ -48,3 +48,4 @@ After downloading the kaggle-api, use `kaggle datasets download --unzip paultimo
 
 - [A pytorch implementation of federated learning](https://github.com/AshwinRJ/Federated-Learning-PyTorch)
 - [Data Poisoning Attacks Against Federated Learning Systems](https://github.com/git-disl/DataPoisoning_FL)
+- [Pytorch Image Classification](https://github.com/bentrevett/pytorch-image-classification)
