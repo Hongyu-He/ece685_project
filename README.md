@@ -2,6 +2,14 @@
 
 This is the repository for ECE685 project: Collaborative Learning of Medical Imaging Models.
 
+- [ECE685 Project: Collaborative Learning of Medical Imaging Models](#ece685-project-collaborative-learning-of-medical-imaging-models)
+  - [Week Process](#week-process)
+  - [Introduction](#introduction)
+  - [Project Goal](#project-goal)
+  - [Dataset](#dataset)
+    - [How to download this dataset](#how-to-download-this-dataset)
+  - [References](#references)
+
 ## Week Process
 
 - [ ] Download datasets
@@ -35,3 +43,8 @@ For downloading the dataset to your local machine, just visit the link above and
 For downloading the dataset to your remote server (or download with command line), you can use [kaggle-api](https://github.com/Kaggle/kaggle-api). 
 
 After downloading the kaggle-api, use `kaggle datasets download --unzip paultimothymooney/chest-xray-pneumonia` to download the dataset to your desired place.
+
+## References
+
+- [A pytorch implementation of federated learning](https://github.com/AshwinRJ/Federated-Learning-PyTorch)
+- [Data Poisoning Attacks Against Federated Learning Systems](https://github.com/git-disl/DataPoisoning_FL)
