@@ -39,7 +39,18 @@ def get_dataset(dataset, num_users, iid=True):
             user_groups = {}
             raise NotImplementedError("Can't sample Non-IID user data")
 
-    return trainset, testset, user_groups
+    return trainset, testset, valset, user_groups
+
+
+def sample_imgs(dataset, num, plot=True):
+    """Sample and plot images from dataset.
+
+    Args:
+        dataset ([type]): [description]
+        num ([type]): [description]
+        plot (bool, optional): [description]. Defaults to True.
+    """
+    # TODO implement me
 
 
 def average_weights(w):

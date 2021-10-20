@@ -3,6 +3,7 @@
 This is the repository for ECE685 project: Collaborative Learning of Medical Imaging Models.
 
 - [ECE685 Project: Collaborative Learning of Medical Imaging Models](#ece685-project-collaborative-learning-of-medical-imaging-models)
+  - [Questions](#questions)
   - [Week Process](#week-process)
   - [Introduction](#introduction)
   - [Project Goal](#project-goal)
@@ -10,12 +11,27 @@ This is the repository for ECE685 project: Collaborative Learning of Medical Ima
     - [How to download this dataset](#how-to-download-this-dataset)
   - [References](#references)
 
+## Questions
+
+- Can wen sample non-iid from iid data? Do we need to find non-iid dataset?
+- How to prepare data for iid and non-iid data?
+
 ## Week Process
 
 - [ ] Download datasets
 - [ ] Configure your experiments environments
-- [ ] Get familiar with the dataset, draft the dataset part of the report
-- [ ] Pickup a CNN model, implement it to perform binary classification on the dataset
+- [ ] Implement dataset: sample data from dataset and plot
+- [ ] implement non-iid sampling
+- [ ] Summarize dataset: 
+  - [ ] total numbers
+  - [ ] number of positive samples
+  - [ ] number of negative samples
+  - [ ] train : test : val
+- [x] implement MLP model
+- [ ] Pickup a CNN model, implement it to perform binary classification on the dataset (CNN with 2 conv layers, VGG, ResNet)
+- [ ] compare running time of FL & non-FL
+- [ ] implement baseline_main.py
+- [ ] implement federated_main.py
 
 ## Introduction
 
