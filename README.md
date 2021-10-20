@@ -5,7 +5,7 @@ This is the repository for ECE685 project: Collaborative Learning of Medical Ima
 ## Authors:
 Yuxuan Chen, Hongyu He, Wei Wu
 
-## Overview: 
+## Contents: 
 
 - [ECE685 Project: Collaborative Learning of Medical Imaging Models](#ece685-project-collaborative-learning-of-medical-imaging-models)
   - [Week Process](#week-process)
