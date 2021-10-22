@@ -2,14 +2,17 @@
 
 This is the repository for ECE685 project: Collaborative Learning of Medical Imaging Models.
 
-## Authors:
+## Authors
+
 Yuxuan Chen, Hongyu He, Wei Wu
 
-## Contents: 
+## Contents
 
 - [ECE685 Project: Collaborative Learning of Medical Imaging Models](#ece685-project-collaborative-learning-of-medical-imaging-models)
+  - [Authors](#authors)
+  - [Contents](#contents)
   - [Questions](#questions)
-  - [Week Process](#week-process)
+  - [TO-DO](#to-do)
   - [Introduction](#introduction)
   - [Project Goal](#project-goal)
   - [Dataset](#dataset)
@@ -18,25 +21,27 @@ Yuxuan Chen, Hongyu He, Wei Wu
 
 ## Questions
 
-- Can wen sample non-iid from iid data? Do we need to find non-iid dataset?
-- How to prepare data for iid and non-iid data?
+No questions for now.
 
-## Week Process
+## TO-DO
 
 - [ ] Download datasets
 - [ ] Configure your experiments environments
-- [ ] Implement dataset: sample data from dataset and plot
-- [ ] implement non-iid sampling
+- [ ] find other dataset with more classes
+- [ ] Implement dataset: 
+  - [ ] sample data from dataset and plot
+  - [ ] implement non-iid sampling
 - [ ] Summarize dataset: 
   - [ ] total numbers
   - [ ] number of positive samples
   - [ ] number of negative samples
   - [ ] train : test : val
 - [x] implement MLP model
-- [ ] Pickup a CNN model, implement it to perform binary classification on the dataset (CNN with 2 conv layers, VGG, ResNet)
+- [ ] Implement more complexed models (CNN with 2 conv layers, VGG, ResNet etc.) Try some more sota image classification models.
 - [ ] compare running time of FL & non-FL
 - [ ] implement baseline_main.py
 - [ ] implement federated_main.py
+- [ ] Research sota federated learning algorithms to improve performance.
 
 ## Introduction
 
