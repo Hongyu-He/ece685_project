@@ -16,7 +16,8 @@ Yuxuan Chen, Hongyu He, Wei Wu
   - [Introduction](#introduction)
   - [Project Goal](#project-goal)
   - [Dataset](#dataset)
-    - [How to download this dataset](#how-to-download-this-dataset)
+    - [imagenette](#imagenette)
+    - [Other options](#other-options)
   - [References](#references)
 
 ## Questions
@@ -25,9 +26,8 @@ No questions for now.
 
 ## TO-DO
 
-- [ ] Download datasets
+- [ ] Download datasets: ImageNet
 - [ ] Configure your experiments environments
-- [ ] find other dataset with more classes
 - [ ] Implement dataset: 
   - [ ] sample data from dataset and plot
   - [ ] implement non-iid sampling
@@ -60,15 +60,15 @@ Federated Learning enables collaborative training of a global model by aggregati
 
 ## Dataset
 
-Dataset used in this project: [Chest X-Ray Images (Pneumonia)](https://www.kaggle.com/paultimothymooney/chest-xray-pneumonia)
+### imagenette
 
-### How to download this dataset
+Github repository of [imagenette](https://github.com/fastai/imagenette).
 
-For downloading the dataset to your local machine, just visit the link above and click download.
+Imagenette is a subset of 10 easily classified classes from Imagenet (tench, English springer, cassette player, chain saw, church, French horn, garbage truck, gas pump, golf ball, parachute).
 
-For downloading the dataset to your remote server (or download with command line), you can use [kaggle-api](https://github.com/Kaggle/kaggle-api). 
+### Other options
 
-After downloading the kaggle-api, use `kaggle datasets download --unzip paultimothymooney/chest-xray-pneumonia` to download the dataset to your desired place.
+- [Collection of textures in colorectal cancer histology](https://zenodo.org/record/53169#.YXWTFy-B1hE): Details about this datasets [Multi-class texture analysis in colorectal cancer histology](https://www.nature.com/articles/srep27988)
 
 ## References
 
