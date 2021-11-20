@@ -78,5 +78,6 @@ Imagenette is a subset of 10 easily classified classes from Imagenet (tench, Eng
   - [A pytorch implementation of federated learning](https://github.com/AshwinRJ/Federated-Learning-PyTorch)
   - [Data Poisoning Attacks Against Federated Learning Systems](https://github.com/git-disl/DataPoisoning_FL)
   - [Pytorch Image Classification](https://github.com/bentrevett/pytorch-image-classification)
+  - [Pytorch imagenet classification](https://github.com/bearpaw/pytorch-classification)
 - Privacy issues of federated learning:
   - [Deep Models Under the GAN: Information Leakage from Collaborative Deep Learning](https://arxiv.org/abs/1702.07464)

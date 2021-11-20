@@ -3,11 +3,9 @@ import copy
 import time
 import pickle
 import numpy as np
+from torch.utils import data
 from tqdm import tqdm
-
 import torch
-from tensorboardX import SummaryWriter
-
 from options import args_parser
 from update import LocalUpdate, test_inference
 from models import MLP, CNNMnist, CNNFashion_Mnist, CNNCifar
@@ -19,7 +17,6 @@ if __name__ == '__main__':
 
     # define paths
     path_project = os.path.abspath('..')
-    logger = SummaryWriter('../logs')
 
     args = args_parser()
     exp_details(args)
@@ -29,7 +26,9 @@ if __name__ == '__main__':
     device = 'cuda' if args.gpu else 'cpu'
 
     # load dataset and user groups
-    train_dataset, test_dataset, user_groups = get_dataset(args)
+    train_dataset, test_dataset, user_groups = get_dataset(
+        dataset=args.dataset, num_users=args.num_users, iid=args.iid
+    )
 
     # BUILD MODEL
     if args.model == 'cnn':
@@ -40,7 +39,6 @@ if __name__ == '__main__':
             global_model = CNNFashion_Mnist(args=args)
         elif args.dataset == 'cifar':
             global_model = CNNCifar(args=args)
-
     elif args.model == 'mlp':
         # Multi-layer preceptron
         img_size = train_dataset[0][0].shape
@@ -77,7 +75,7 @@ if __name__ == '__main__':
 
         for idx in idxs_users:
             local_model = LocalUpdate(args=args, dataset=train_dataset,
-                                      idxs=user_groups[idx], logger=logger)
+                                      idxs=user_groups[idx])
             w, loss = local_model.update_weights(
                 model=copy.deepcopy(global_model), global_round=epoch)
             local_weights.append(copy.deepcopy(w))
