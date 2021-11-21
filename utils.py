@@ -6,7 +6,7 @@ from torchvision.datasets import ImageFolder
 from sampling import sample_iid, sample_noniid
 
 
-def get_dataset(dataset='imagenet', num_users=10, iid=1):
+def get_dataset(data_dir, dataset='imagenet', num_users=10, iid=1):
     """Returns train and test datasets and a user group which is a dict where
     the keys are the user index sand the values are the corresponding data for
     each of those users.
@@ -25,7 +25,6 @@ def get_dataset(dataset='imagenet', num_users=10, iid=1):
             each of those users.
     """
     if dataset == 'imagenet':
-        data_dir = '../data/imagenette2/'
         traindir = os.path.join(data_dir, 'train')
         testdir = os.path.join(data_dir, 'val')
 
@@ -58,6 +57,22 @@ def get_dataset(dataset='imagenet', num_users=10, iid=1):
             raise NotImplementedError("Can't sample Non-IID user data")
 
     return trainset, testset, user_groups
+
+
+def accuracy(output, target, topk=(1,)):
+    """Computes the precision@k for the specified values of k"""
+    maxk = max(topk)
+    batch_size = target.size(0)
+
+    _, pred = output.topk(maxk, 1, True, True)
+    pred = pred.t()
+    correct = pred.eq(target.view(1, -1).expand_as(pred))
+
+    res = []
+    for k in topk:
+        correct_k = correct[:k].view(-1).float().sum(0)
+        res.append(correct_k.mul_(100.0 / batch_size))
+    return res
 
 
 def sample_imgs(dataset, num, plot=True):

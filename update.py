@@ -1,6 +1,7 @@
 import torch
 from torch import nn
 from torch.utils.data import DataLoader, Dataset
+from utils import accuracy
 
 
 class DatasetSplit(Dataset):
@@ -20,14 +21,13 @@ class DatasetSplit(Dataset):
 
 
 class LocalUpdate(object):
-    def __init__(self, args, dataset, idxs, logger):
+    def __init__(self, args, dataset, idxs):
         self.args = args
-        self.logger = logger
         self.trainloader, self.validloader, self.testloader = self.train_val_test(
             dataset, list(idxs))
-        self.device = 'cuda' if args.gpu else 'cpu'
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         # Default criterion set to NLL loss function
-        self.criterion = nn.NLLLoss().to(self.device)
+        self.criterion = nn.CrossEntropyLoss().to(self.device)
 
     def train_val_test(self, dataset, idxs):
         """
@@ -54,29 +54,35 @@ class LocalUpdate(object):
 
         # Set optimizer for the local updates
         if self.args.optimizer == 'sgd':
-            optimizer = torch.optim.SGD(model.parameters(), lr=self.args.lr,
-                                        momentum=0.5)
-        elif self.args.optimizer == 'adam':
-            optimizer = torch.optim.Adam(model.parameters(), lr=self.args.lr,
-                                         weight_decay=1e-4)
+            optimizer = torch.optim.SGD(model.parameters(), 
+                                        lr=self.args.lr,
+                                        momentum=0.9,
+                                        weight_decay=1e-4)
+        else:
+            raise NotImplementedError(f'Optimization method \
+                {self.args.optimizer} is not implemented.')
 
         for iter in range(self.args.local_ep):
             batch_loss = []
             for batch_idx, (images, labels) in enumerate(self.trainloader):
                 images, labels = images.to(self.device), labels.to(self.device)
 
-                model.zero_grad()
                 log_probs = model(images)
                 loss = self.criterion(log_probs, labels)
+
+                acc1 = accuracy(log_probs.data, labels.data)[0]
+
+                # compute gradient and do SGD step
+                optimizer.zero_grad()
                 loss.backward()
                 optimizer.step()
 
                 if self.args.verbose and (batch_idx % 10 == 0):
-                    print('| Global Round : {} | Local Epoch : {} | [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
+                    print('| Global Round : {} | Local Epoch : {} | [{}/{} ({:.0f}%)]\tLoss: {:.6f}\tAcc: {:.2f}'.format(
                         global_round, iter, batch_idx * len(images),
                         len(self.trainloader.dataset),
-                        100. * batch_idx / len(self.trainloader), loss.item()))
-                self.logger.add_scalar('loss', loss.item())
+                        100. * batch_idx / len(self.trainloader), loss.item(), acc1.item()))
+
                 batch_loss.append(loss.item())
             epoch_loss.append(sum(batch_loss)/len(batch_loss))
 
@@ -114,7 +120,7 @@ def test_inference(args, model, test_dataset):
     model.eval()
     loss, total, correct = 0.0, 0.0, 0.0
 
-    device = 'cuda' if args.gpu else 'cpu'
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     criterion = nn.NLLLoss().to(device)
     testloader = DataLoader(test_dataset, batch_size=128,
                             shuffle=False)

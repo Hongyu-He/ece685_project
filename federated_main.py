@@ -8,7 +8,7 @@ from tqdm import tqdm
 import torch
 from options import args_parser
 from update import LocalUpdate, test_inference
-from models import MLP, CNNMnist, CNNFashion_Mnist, CNNCifar
+from models.imagenet import resnext50
 from utils import get_dataset, average_weights, exp_details
 
 
@@ -21,37 +21,30 @@ if __name__ == '__main__':
     args = args_parser()
     exp_details(args)
 
-    if args.gpu_id:
-        torch.cuda.set_device(args.gpu_id)
-    device = 'cuda' if args.gpu else 'cpu'
+    # if args.gpu_id:
+    #     torch.cuda.set_device(args.gpu_id)
+    # device = 'cuda' if args.gpu else 'cpu'
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     # load dataset and user groups
     train_dataset, test_dataset, user_groups = get_dataset(
-        dataset=args.dataset, num_users=args.num_users, iid=args.iid
+        data_dir=args.data_dir, dataset=args.dataset, 
+        num_users=args.num_users, iid=args.iid
     )
 
     # BUILD MODEL
-    if args.model == 'cnn':
-        # Convolutional neural netork
-        if args.dataset == 'mnist':
-            global_model = CNNMnist(args=args)
-        elif args.dataset == 'fmnist':
-            global_model = CNNFashion_Mnist(args=args)
-        elif args.dataset == 'cifar':
-            global_model = CNNCifar(args=args)
-    elif args.model == 'mlp':
-        # Multi-layer preceptron
-        img_size = train_dataset[0][0].shape
-        len_in = 1
-        for x in img_size:
-            len_in *= x
-            global_model = MLP(dim_in=len_in, dim_hidden=64,
-                               dim_out=args.num_classes)
+    if args.model == 'resnext':
+        global_model = resnext50(
+            baseWidth=args.basewidth,
+            cardinality=args.cardinality)
     else:
         exit('Error: unrecognized model')
 
     # Set the model to train and send it to device.
-    global_model.to(device)
+    if torch.cuda.is_available():
+        global_model = torch.nn.DataParallel(global_model).cuda()
+    else:
+        global_model.to(device)
     global_model.train()
     print(global_model)
 
@@ -62,7 +55,7 @@ if __name__ == '__main__':
     train_loss, train_accuracy = [], []
     val_acc_list, net_list = [], []
     cv_loss, cv_acc = [], []
-    print_every = 2
+    print_every = 1
     val_loss_pre, counter = 0, 0
 
     for epoch in tqdm(range(args.epochs)):
@@ -70,6 +63,7 @@ if __name__ == '__main__':
         print(f'\n | Global Training Round : {epoch+1} |\n')
 
         global_model.train()
+        # number of clients participating in this global round
         m = max(int(args.frac * args.num_users), 1)
         idxs_users = np.random.choice(range(args.num_users), m, replace=False)
 
@@ -95,10 +89,11 @@ if __name__ == '__main__':
         global_model.eval()
         for c in range(args.num_users):
             local_model = LocalUpdate(args=args, dataset=train_dataset,
-                                      idxs=user_groups[idx], logger=logger)
+                                      idxs=user_groups[idx])
             acc, loss = local_model.inference(model=global_model)
             list_acc.append(acc)
             list_loss.append(loss)
+        # average accuracy of all clients
         train_accuracy.append(sum(list_acc)/len(list_acc))
 
         # print global training loss after every 'i' rounds
@@ -107,20 +102,20 @@ if __name__ == '__main__':
             print(f'Training Loss : {np.mean(np.array(train_loss))}')
             print('Train Accuracy: {:.2f}% \n'.format(100*train_accuracy[-1]))
 
+    file_name = args.results_dir+f'/{args.dataset}_{args.model}_\
+                    {args.epochs}_C[{args.frac}]_iid[{args.iid}]_\
+                    E[{args.local_ep}]_B[{args.local_bs}].pkl'
+    with open(file_name, 'wb') as f:
+        train_log = {'loss': train_loss,
+                     'acc': train_accuracy}
+        pickle.dump(train_log, f)
+
     # Test inference after completion of training
     test_acc, test_loss = test_inference(args, global_model, test_dataset)
 
     print(f' \n Results after {args.epochs} global rounds of training:')
     print("|---- Avg Train Accuracy: {:.2f}%".format(100*train_accuracy[-1]))
     print("|---- Test Accuracy: {:.2f}%".format(100*test_acc))
-
-    # Saving the objects train_loss and train_accuracy:
-    file_name = '../save/objects/{}_{}_{}_C[{}]_iid[{}]_E[{}]_B[{}].pkl'.\
-        format(args.dataset, args.model, args.epochs, args.frac, args.iid,
-               args.local_ep, args.local_bs)
-
-    with open(file_name, 'wb') as f:
-        pickle.dump([train_loss, train_accuracy], f)
 
     print('\n Total Run Time: {0:0.4f}'.format(time.time()-start_time))
 
