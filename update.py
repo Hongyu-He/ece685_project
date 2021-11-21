@@ -94,6 +94,8 @@ class LocalUpdate(object):
 
         model.eval()
         loss, total, correct = 0.0, 0.0, 0.0
+        log_probs = []
+        true_labels = []
 
         for batch_idx, (images, labels) in enumerate(self.testloader):
             images, labels = images.to(self.device), labels.to(self.device)
@@ -104,13 +106,19 @@ class LocalUpdate(object):
             loss += batch_loss.item()
 
             # Prediction
+            # log_probs.append(outputs)
+            # true_labels.append(labels)
             _, pred_labels = torch.max(outputs, 1)
             pred_labels = pred_labels.view(-1)
             correct += torch.sum(torch.eq(pred_labels, labels)).item()
             total += len(labels)
+        
+        # log_probs = torch.cat(log_probs, dim=1)
+        # true_labels = torch.cat(true_labels, dim=1)
+        # acc = accuracy(log_probs.data, true_labels.data)[0]
+        acc = correct / total
 
-        accuracy = correct/total
-        return accuracy, loss
+        return acc, loss
 
 
 def test_inference(args, model, test_dataset):
@@ -121,7 +129,7 @@ def test_inference(args, model, test_dataset):
     loss, total, correct = 0.0, 0.0, 0.0
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    criterion = nn.NLLLoss().to(device)
+    criterion = nn.CrossEntropyLoss().to(device)
     testloader = DataLoader(test_dataset, batch_size=128,
                             shuffle=False)
 
@@ -139,5 +147,5 @@ def test_inference(args, model, test_dataset):
         correct += torch.sum(torch.eq(pred_labels, labels)).item()
         total += len(labels)
 
-    accuracy = correct/total
-    return accuracy, loss
+    acc = correct/total
+    return acc, loss

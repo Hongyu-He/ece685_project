@@ -107,7 +107,8 @@ if __name__ == '__main__':
                     E[{args.local_ep}]_B[{args.local_bs}].pkl'
     with open(file_name, 'wb') as f:
         train_log = {'loss': train_loss,
-                     'acc': train_accuracy}
+                     'acc': train_accuracy,
+                     'weights': global_model.state_dict()}
         pickle.dump(train_log, f)
 
     # Test inference after completion of training
