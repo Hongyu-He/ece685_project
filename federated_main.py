@@ -15,15 +15,9 @@ from utils import get_dataset, average_weights, exp_details
 if __name__ == '__main__':
     start_time = time.time()
 
-    # define paths
-    path_project = os.path.abspath('..')
-
     args = args_parser()
     exp_details(args)
 
-    # if args.gpu_id:
-    #     torch.cuda.set_device(args.gpu_id)
-    # device = 'cuda' if args.gpu else 'cpu'
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     # load dataset and user groups
@@ -54,7 +48,6 @@ if __name__ == '__main__':
     # Training
     train_loss, train_accuracy = [], []
     val_acc_list, net_list = [], []
-    cv_loss, cv_acc = [], []
     print_every = 1
     val_loss_pre, counter = 0, 0
 

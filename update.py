@@ -1,5 +1,6 @@
 import torch
 from torch import nn
+import numpy as np
 from torch.utils.data import DataLoader, Dataset
 from utils import accuracy
 
@@ -34,6 +35,7 @@ class LocalUpdate(object):
         Returns train, validation and test dataloaders for a given dataset
         and user indexes.
         """
+        np.random.shuffle(idxs)
         # split indexes for train, validation, and test (80, 10, 10)
         idxs_train = idxs[:int(0.8*len(idxs))]
         idxs_val = idxs[int(0.8*len(idxs)):int(0.9*len(idxs))]
