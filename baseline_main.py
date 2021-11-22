@@ -1,23 +1,33 @@
+import os
+import time
+
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 
 import torch
 from torch.utils.data import DataLoader
 
-from utils import get_dataset
-from config import args_parser
+from utils import get_dataset, exp_details, average_weights
+from options import args_parser
 from update import test_inference
 from models import MLP, CNN
 
+from models.imagenet import resnext50
+
 
 if __name__ == '__main__':
+    start_time = time.time()
+    # define paths
+    path_project = os.path.abspath('..')
+
     args = args_parser()
-    if args.gpu:
-        torch.cuda.set_device(args.gpu)
-    device = 'cuda' if args.gpu else 'cpu'
+    exp_details(args)
+
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     # load datasets
     train_dataset, test_dataset, _ = get_dataset(args.dataset, args.num_users)
+    # args.num_users = 1
 
     # BUILD MODEL
     # TODO implement the models
@@ -44,13 +54,14 @@ if __name__ == '__main__':
     # Set optimizer and criterion
     if args.optimizer == 'sgd':
         optimizer = torch.optim.SGD(global_model.parameters(), lr=args.lr,
-                                    momentum=0.5)
+                                    momentum=0.9)
     elif args.optimizer == 'adam':
         optimizer = torch.optim.Adam(global_model.parameters(), lr=args.lr,
                                      weight_decay=1e-4)
 
     trainloader = DataLoader(train_dataset, batch_size=64, shuffle=True)
     criterion = torch.nn.NLLLoss().to(device)
+    # cross entropy
     epoch_loss = []
 
     for epoch in tqdm(range(args.epochs)):
