@@ -1,62 +1,75 @@
+import os
+import copy
+import time
+import numpy as np
 from tqdm import tqdm
 import matplotlib.pyplot as plt
-
 import torch
-from torch.utils.data import DataLoader
-
-from utils import get_dataset
-from config import args_parser
-from update import test_inference
-from models import MLP, CNN
+from torch.utils.data import random_split, DataLoader
+from utils import get_dataset, exp_details, average_weights
+from options import args_parser
+from update import test_inference, LocalUpdate
+# from models import MLP, CNN
+from models.imagenet import resnext50
 
 
 if __name__ == '__main__':
+    start_time = time.time()
+    # define paths
+    path_project = os.path.abspath('..')
+
     args = args_parser()
-    if args.gpu:
-        torch.cuda.set_device(args.gpu)
-    device = 'cuda' if args.gpu else 'cpu'
+    exp_details(args)
+
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     # load datasets
-    train_dataset, test_dataset, _ = get_dataset(args.dataset, args.num_users)
+    train_dataset, test_dataset, _ = get_dataset(
+        data_dir=args.data_dir, dataset=args.dataset,
+        num_users=1, iid=args.iid
+    )
+    train_set, val_set = random_split(
+        train_dataset,
+        [0.8*len(train_dataset), 0.2*len(train_dataset)]
+    )
 
     # BUILD MODEL
-    # TODO implement the models
-    if args.model == 'cnn':
-        # Convolutional neural netork
-        global_model = CNN()
-    elif args.model == 'mlp':
-        # Multi-layer preceptron
-        img_size = train_dataset[0][0].shape
-        len_in = 1
-        for x in img_size:
-            len_in *= x
-        global_model = MLP(dim_in=len_in, dim_hidden=64,
-                           dim_out=args.num_classes)
+    if args.model == 'resnext':
+        global_model = resnext50(
+            baseWidth=args.basewidth,
+            cardinality=args.cardinality)
     else:
-        raise NotImplementedError(f"{args.model} is not implemented.")
+        exit('Error: unrecognized model')
 
     # Set the model to train and send it to device.
-    global_model.to(device)
+    if torch.cuda.is_available():
+        global_model = torch.nn.DataParallel(global_model).cuda()
+    else:
+        global_model.to(device)
     global_model.train()
     print(global_model)
+
+    global_weights = global_model.state_dict()
 
     # Training
     # Set optimizer and criterion
     if args.optimizer == 'sgd':
         optimizer = torch.optim.SGD(global_model.parameters(), lr=args.lr,
-                                    momentum=0.5)
+                                    momentum=0.9)
     elif args.optimizer == 'adam':
         optimizer = torch.optim.Adam(global_model.parameters(), lr=args.lr,
                                      weight_decay=1e-4)
 
-    trainloader = DataLoader(train_dataset, batch_size=64, shuffle=True)
-    criterion = torch.nn.NLLLoss().to(device)
+    train_loader = DataLoader(train_set, batch_size=64, shuffle=True)
+    val_loader = DataLoader(train_set, batch_size=64, shuffle=False)
+    criterion = torch.nn.CrossEntropyLoss().to(device)
+    # cuda
     epoch_loss = []
 
     for epoch in tqdm(range(args.epochs)):
         batch_loss = []
 
-        for batch_idx, (images, labels) in enumerate(trainloader):
+        for batch_idx, (images, labels) in enumerate(train_loader):
             images, labels = images.to(device), labels.to(device)
 
             optimizer.zero_grad()
