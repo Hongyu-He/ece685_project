@@ -1,17 +1,15 @@
 import os
+import copy
 import time
-
+import numpy as np
 from tqdm import tqdm
 import matplotlib.pyplot as plt
-
 import torch
-from torch.utils.data import DataLoader
-
+from torch.utils.data import random_split, DataLoader
 from utils import get_dataset, exp_details, average_weights
 from options import args_parser
-from update import test_inference
-from models import MLP, CNN
-
+from update import test_inference, LocalUpdate
+# from models import MLP, CNN
 from models.imagenet import resnext50
 
 
@@ -26,29 +24,32 @@ if __name__ == '__main__':
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     # load datasets
-    train_dataset, test_dataset, _ = get_dataset(args.dataset, args.num_users)
-    # args.num_users = 1
+    train_dataset, test_dataset, _ = get_dataset(
+        data_dir=args.data_dir, dataset=args.dataset,
+        num_users=1, iid=args.iid
+    )
+    train_set, val_set = random_split(
+        train_dataset,
+        [0.8*len(train_dataset), 0.2*len(train_dataset)]
+    )
 
     # BUILD MODEL
-    # TODO implement the models
-    if args.model == 'cnn':
-        # Convolutional neural netork
-        global_model = CNN()
-    elif args.model == 'mlp':
-        # Multi-layer preceptron
-        img_size = train_dataset[0][0].shape
-        len_in = 1
-        for x in img_size:
-            len_in *= x
-        global_model = MLP(dim_in=len_in, dim_hidden=64,
-                           dim_out=args.num_classes)
+    if args.model == 'resnext':
+        global_model = resnext50(
+            baseWidth=args.basewidth,
+            cardinality=args.cardinality)
     else:
-        raise NotImplementedError(f"{args.model} is not implemented.")
+        exit('Error: unrecognized model')
 
     # Set the model to train and send it to device.
-    global_model.to(device)
+    if torch.cuda.is_available():
+        global_model = torch.nn.DataParallel(global_model).cuda()
+    else:
+        global_model.to(device)
     global_model.train()
     print(global_model)
+
+    global_weights = global_model.state_dict()
 
     # Training
     # Set optimizer and criterion
