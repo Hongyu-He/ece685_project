@@ -60,15 +60,16 @@ if __name__ == '__main__':
         optimizer = torch.optim.Adam(global_model.parameters(), lr=args.lr,
                                      weight_decay=1e-4)
 
-    trainloader = DataLoader(train_dataset, batch_size=64, shuffle=True)
-    criterion = torch.nn.NLLLoss().to(device)
-    # cross entropy
+    train_loader = DataLoader(train_set, batch_size=64, shuffle=True)
+    val_loader = DataLoader(train_set, batch_size=64, shuffle=False)
+    criterion = torch.nn.CrossEntropyLoss().to(device)
+    # cuda
     epoch_loss = []
 
     for epoch in tqdm(range(args.epochs)):
         batch_loss = []
 
-        for batch_idx, (images, labels) in enumerate(trainloader):
+        for batch_idx, (images, labels) in enumerate(train_loader):
             images, labels = images.to(device), labels.to(device)
 
             optimizer.zero_grad()
