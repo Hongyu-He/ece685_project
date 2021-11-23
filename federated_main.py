@@ -95,9 +95,7 @@ if __name__ == '__main__':
             print(f'Training Loss : {np.mean(np.array(train_loss))}')
             print('Train Accuracy: {:.2f}% \n'.format(100*train_accuracy[-1]))
 
-    file_name = args.results_dir+f'/{args.dataset}_{args.model}_\
-                    {args.epochs}_C[{args.frac}]_iid[{args.iid}]_\
-                    E[{args.local_ep}]_B[{args.local_bs}].pkl'
+    file_name = args.results_dir+f'/{args.dataset}_{args.model}_{args.epochs}_C[{args.frac}]_iid[{args.iid}]_E[{args.local_ep}]_B[{args.local_bs}].pkl'
     with open(file_name, 'wb') as f:
         train_log = {'loss': train_loss,
                      'acc': train_accuracy,

@@ -39,9 +39,7 @@ if __name__ == '__main__':
     else:
         global_model.to(device)
     
-    file_name = args.results_dir+f'/{args.dataset}_{args.model}_\
-                    {args.epochs}_C[{args.frac}]_iid[{args.iid}]_\
-                    E[{args.local_ep}]_B[{args.local_bs}].pkl'
+    file_name = args.results_dir+f'/{args.dataset}_{args.model}_{args.epochs}_C[{args.frac}]_iid[{args.iid}]_E[{args.local_ep}]_B[{args.local_bs}].pkl'
     
     with open(file_name, 'rb') as f:
         logger = pickle.load(f)
