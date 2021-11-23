@@ -62,8 +62,55 @@ if __name__ == '__main__':
 
     train_loader = DataLoader(train_set, batch_size=64, shuffle=True)
     val_loader = DataLoader(train_set, batch_size=64, shuffle=False)
-    criterion = torch.nn.CrossEntropyLoss().to(device)
-    # cuda
+
+    if torch.cuda.is_available():
+        criterion = torch.nn.CrossEntropyLoss().cuda()
+    else:
+        criterion = torch.nn.CrossEntropyLoss().to(device)
+
+    best_acc = 0  # best validation accuracy
+    start_epoch = 0
+    num_epoch = args.epochs * args.local_ep  # global epoch x local epoch
+
+    for epoch in range(start_epoch, num_epoch):
+        adjust_learning_rate(optimizer, epoch)
+
+        print('\nEpoch: [%d | %d] LR: %f' % (epoch + 1, num_epoch, state['lr']))
+
+        train_loss, train_acc = train(train_loader, model, criterion, optimizer, epoch, use_cuda)
+        test_loss, test_acc = test(val_loader, model, criterion, epoch, use_cuda)
+
+        # append logger file
+        logger.append([state['lr'], train_loss, test_loss, train_acc, test_acc])
+
+        # save model
+        is_best = test_acc > best_acc
+        best_acc = max(test_acc, best_acc)
+        save_checkpoint({
+            'epoch': epoch + 1,
+            'state_dict': model.state_dict(),
+            'acc': test_acc,
+            'best_acc': best_acc,
+            'optimizer': optimizer.state_dict(),
+        }, is_best, checkpoint=args.checkpoint)
+
+    logger.close()
+    logger.plot()
+    savefig(os.path.join(args.checkpoint, 'log.eps'))
+
+    print('Best acc:')
+    print(best_acc)
+
+
+def adjust_learning_rate(optimizer, epoch):
+    global state
+    if epoch in [0.6*num_epoch, 0.9*num_epoch]:
+        state['lr'] *= args.lr
+        for param_group in optimizer.param_groups:
+            param_group['lr'] = state['lr']
+
+
+
     epoch_loss = []
 
     for epoch in tqdm(range(args.epochs)):
