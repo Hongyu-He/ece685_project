@@ -1,3 +1,5 @@
 checkpoints
 dev_test.ipynb
 .idea
+__pycache__
+models
