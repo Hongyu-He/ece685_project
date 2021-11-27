@@ -21,12 +21,20 @@ def sample_iid(dataset, num_users):
     return dict_users
 
 
-def sample_noniid(dataset, num_users):
+def sample_noniid(dataset, client_data_ratio, client_data_size):
     """Sample non-iid data from dataset for each user.
 
     Args:
-        dataset ([type]): [description]
-        num_users ([type]): [description]
+        dataset ([torch.datasets]): dataset to sample from
+        client_data_ratio ([type]): distribution of each local datasets. A matrix where
+            each row represents the class distribution within one client's dataset.
+        client_data_size: ratio of the dataset within each client. 
+    Returns:
+        dict_users: dict_users: dictionary of data index for each user 
+            {user_id: set(data_index)}
     """
     # TODO implement sample non-iid
+
+    ### return 
+
     pass
