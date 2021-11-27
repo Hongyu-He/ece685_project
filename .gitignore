@@ -1,2 +1,5 @@
 checkpoints
 .idea
+__pycache__/
+models/
+
