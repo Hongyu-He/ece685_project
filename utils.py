@@ -53,7 +53,7 @@ def get_dataset(data_dir, dataset='imagenet', num_users=10, iid=1):
         else:
             # TODO Sample Non-IID user data
             # user_groups = sample_noniid(trainset, num_users)
-            user_groups = {}
+            user_groups = sample_noniid(trainset, client_data_ratio = None, is_overlap = False)
             raise NotImplementedError("Can't sample Non-IID user data")
 
     return trainset, testset, user_groups
