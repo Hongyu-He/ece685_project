@@ -100,6 +100,53 @@ class LocalUpdate(object):
 
         return model.state_dict(), sum(epoch_loss) / len(epoch_loss)
 
+
+    def baseline_update_weights(self, model, baseline_round):
+        # keep a copy of the old model parameters
+        old_model = copy.deepcopy(model)
+
+        # Set mode to train model
+        model.train()
+        epoch_loss = []
+
+        # Set optimizer for the local updates
+        if self.args.optimizer == 'sgd':
+            optimizer = torch.optim.SGD(model.parameters(),
+                                        lr=self.args.lr,
+                                        momentum=0.9,
+                                        weight_decay=1e-4)
+        else:
+            raise NotImplementedError(f'Optimization method \
+                {self.args.optimizer} is not implemented.')
+
+        batch_loss = []
+        for batch_idx, (images, labels) in enumerate(self.trainloader):
+            images, labels = images.to(self.device), labels.to(self.device)
+
+            log_probs = model(images)
+            loss = self.criterion(log_probs, labels)
+
+            acc1 = accuracy(log_probs.data, labels.data)[0]
+
+            # compute gradient and do SGD step
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+
+            if self.args.verbose and (batch_idx % 50 == 0):
+                print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}\tAcc: {:.2f}'.format(
+                    baseline_round+1, batch_idx * len(images), len(self.trainloader.dataset),
+                    100. * batch_idx / len(self.trainloader), loss.item(), acc1.item()))
+
+            batch_loss.append(loss.item())
+
+        loss_avg = sum(batch_loss)/len(batch_loss)
+        print('\nTrain loss:', loss_avg)
+        epoch_loss.append(loss_avg)
+
+        return model.state_dict(), sum(epoch_loss) / len(epoch_loss)
+
+
     def inference(self, model):
         """ Returns the inference accuracy and loss.
         """
