@@ -71,19 +71,21 @@ if __name__ == '__main__':
     for epoch in tqdm(range(num_epochs)):
         print(f'\n | Base Training Round : {epoch + 1} |\n')
 
-        base_model.train()
-        base_model = LocalUpdate(args=args, dataset=train_dataset,
+        # base_model.train()
+        local_model = LocalUpdate(args=args, dataset=train_dataset,
                                  idxs=train_inds)
-        w, loss = base_model.update_weights(
+        w, loss = local_model.update_weights(
             model=base_model, global_round=epoch)
 
         # Update weights
         base_model.load_state_dict(w)
 
-        # Calculate training loss and accuracy at every epoch
+        # Calculate training loss at every epoch
         train_loss.append(loss)
 
-        acc, loss = base_model.inference(model=base_model)
+        # Calculate training accuracy at every epoch
+        base_model.eval()
+        acc, loss = local_model.inference(model=base_model)
         train_accuracy.append(acc)
 
         # print training loss and acc after every 'i' rounds
