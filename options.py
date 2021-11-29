@@ -48,9 +48,9 @@ def args_parser():
     # other arguments
     parser.add_argument('--dataset', type=str, default='imagenet', help="name \
                         of dataset")
-    parser.add_argument('--data_dir', type=str, default='/home/hh239/ece685/data/imagenette2',
+    parser.add_argument('--data_dir', type=str, default='../data/imagenette2',
                         help='Path to the dataset folder.')
-    parser.add_argument('--results_dir', type=str, default='/home/hh239/ece685/ece685_project/results',
+    parser.add_argument('--results_dir', type=str, default='./results',
                         help='Path to the results folder.')
     parser.add_argument('--num_classes', type=int, default=10, help="number \
                         of classes")

@@ -79,55 +79,14 @@ if __name__ == '__main__':
     else:
         criterion = torch.nn.CrossEntropyLoss().to(device)
 
-# # Imagenet Code
-#     # Train and val
-#     best_acc = 0  # best validation accuracy
-#     start_epoch = 0
-#     num_epochs = args.epochs * args.local_ep  # global epoch x local epoch
-#
-#     for epoch in range(start_epoch, num_epochs):
-#         adjust_learning_rate(optimizer, epoch)
-#
-#         print('\nEpoch: [%d | %d] LR: %f' % (epoch + 1, num_epochs, state['lr']))
-#
-#         train_loss, train_acc = train(train_loader, model, criterion, optimizer, epoch, use_cuda)
-#         test_loss, test_acc = test(val_loader, model, criterion, epoch, use_cuda)
-#
-#         # append logger file
-#         logger.append([state['lr'], train_loss, test_loss, train_acc, test_acc])
-#
-#         # save model
-#         is_best = test_acc > best_acc
-#         best_acc = max(test_acc, best_acc)
-#         save_checkpoint({
-#             'epoch': epoch + 1,
-#             'state_dict': model.state_dict(),
-#             'acc': test_acc,
-#             'best_acc': best_acc,
-#             'optimizer': optimizer.state_dict(),
-#         }, is_best, checkpoint=args.checkpoint)
-#
-#     logger.close()
-#     logger.plot()
-#     savefig(os.path.join(args.checkpoint, 'log.eps'))
-#
-#     print('Best acc:')
-#     print(best_acc)
-#
-#
-# def adjust_learning_rate(optimizer, epoch):
-#     global state
-#     if epoch in [0.6*num_epochs, 0.9*num_epochs]:
-#         state['lr'] *= args.lr
-#         for param_group in optimizer.param_groups:
-#             param_group['lr'] = state['lr']
-
-
-# Baseline Code
+# Baseline Training Code
     epoch_loss = []
+    epoch_acc = []
     num_epochs = args.epochs * args.local_ep
+
     for epoch in tqdm(range(num_epochs)):
         batch_loss = []
+        batch_acc = []
 
         for batch_idx, (images, labels) in enumerate(train_loader):
             images, labels = images.to(device), labels.to(device)
@@ -137,6 +96,7 @@ if __name__ == '__main__':
             loss = criterion(outputs, labels)
             loss.backward()
             optimizer.step()
+            # calculate batch_acc
 
             if batch_idx % 50 == 0:
                 print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
@@ -148,15 +108,15 @@ if __name__ == '__main__':
         print('\nTrain loss:', loss_avg)
         epoch_loss.append(loss_avg)
 
-    # Plot loss
-    plt.figure()
-    plt.plot(range(len(epoch_loss)), epoch_loss)
-    plt.xlabel('epochs')
-    plt.ylabel('Train loss')
-    plt.savefig('../save/nn_{}_{}_{}.png'.format(args.dataset, args.model,
-                                                 num_epochs))
-
-    # testing
-    test_acc, test_loss = test_inference(args, global_model, test_dataset)
-    print('Test on', len(test_dataset), 'samples')
-    print("Test Accuracy: {:.2f}%".format(100*test_acc))
+    # # Plot loss
+    # plt.figure()
+    # plt.plot(range(len(epoch_loss)), epoch_loss)
+    # plt.xlabel('epochs')
+    # plt.ylabel('Train loss')
+    # plt.savefig('../save/nn_{}_{}_{}.png'.format(args.dataset, args.model,
+    #                                              num_epochs))
+    #
+    # # testing
+    # test_acc, test_loss = test_inference(args, global_model, test_dataset)
+    # print('Test on', len(test_dataset), 'samples')
+    # print("Test Accuracy: {:.2f}%".format(100*test_acc))
