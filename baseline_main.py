@@ -24,9 +24,13 @@ if __name__ == '__main__':
 
     # Load Datasets
     path_project = os.path.abspath('..')
+#     # container path
+#     path_project = '/home/jovyan/work'
+
     # train on whole dataset
     train_dataset, test_dataset, _ = get_dataset(
-        data_dir=f'{path_project}/data/imagenette2/', dataset=args.dataset,
+#         data_dir=f'{path_project}/data/imagenette2/',
+        data_dir=args.data_dir, dataset=args.dataset,
         num_users=1, iid=1
     )
     # train on 1/5 dataset
