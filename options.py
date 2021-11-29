@@ -21,7 +21,7 @@ def args_parser():
                         help="local batch size: B")
     parser.add_argument('--lr', type=float, default=0.01,
                         help='learning rate')
-    parser.add_argument('--mu', type=float, default=0.1,
+    parser.add_argument('--mu', type=float, default=0.01,
                         help='mu for FedProx')
     parser.add_argument('--momentum', type=float, default=0.5,
                         help='SGD momentum (default: 0.5)')

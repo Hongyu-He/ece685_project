@@ -34,7 +34,6 @@ def sample_noniid(dataset, client_data_ratio = None, is_overlap = False): #clien
         dict_users: dictionary of data index for each user 
             {user_id: list(data_index)}
     """
-    # TODO implement sample non-iid 
     CLIENT_DATA_RATIO = np.array([[0.3, 0, 0, 0.1, 0., 0, 0.3, 0.3, 0, 0],
                                  [0., 0.3, 0, 0.3, 0., 0, 0.1, 0, 0.25, 0.05],
                                  [0., 0, 0.2, 0., 0., 0.3, 0, 0., 0.1, 0.4],
