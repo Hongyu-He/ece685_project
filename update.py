@@ -1,4 +1,5 @@
 import torch
+import copy
 from torch import nn
 import numpy as np
 from torch.utils.data import DataLoader, Dataset
@@ -50,6 +51,9 @@ class LocalUpdate(object):
         return trainloader, validloader, testloader
 
     def update_weights(self, model, global_round):
+        # keep a copy of the old model parameters
+        old_model = copy.deepcopy(model)
+
         # Set mode to train model
         model.train()
         epoch_loss = []
@@ -71,6 +75,12 @@ class LocalUpdate(object):
 
                 log_probs = model(images)
                 loss = self.criterion(log_probs, labels)
+
+                if self.args.fed == 'fedprox':
+                    w_diff = torch.tensor(0., device=self.device)
+                    for w, w_t in zip(old_model.parameters(), model.parameters()):
+                        w_diff += torch.pow(torch.norm(w - w_t), 2)
+                    loss += self.args.mu / 2. * w_diff
 
                 acc1 = accuracy(log_probs.data, labels.data)[0]
 

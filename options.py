@@ -21,8 +21,14 @@ def args_parser():
                         help="local batch size: B")
     parser.add_argument('--lr', type=float, default=0.01,
                         help='learning rate')
+    parser.add_argument('--mu', type=float, default=0.1,
+                        help='mu for FedProx')
     parser.add_argument('--momentum', type=float, default=0.5,
                         help='SGD momentum (default: 0.5)')
+    parser.add_argument('--fed', type=str, default='fedavg', 
+                        choices=['fedavg', 'fedprox'],
+                        help="Which federated learning optimization method, \
+                        support ['fedavg', 'fedprox']")
 
     # model arguments
     parser.add_argument('--model', type=str, default='resnext', help='model name')
@@ -48,9 +54,9 @@ def args_parser():
     # other arguments
     parser.add_argument('--dataset', type=str, default='imagenet', help="name \
                         of dataset")
-    parser.add_argument('--data_dir', type=str, default='/home/hh239/ece685/data/imagenette2',
+    parser.add_argument('--data_dir', type=str, default='../data/imagenette2',
                         help='Path to the dataset folder.')
-    parser.add_argument('--results_dir', type=str, default='/home/hh239/ece685/ece685_project/results',
+    parser.add_argument('--results_dir', type=str, default='./results',
                         help='Path to the results folder.')
     parser.add_argument('--num_classes', type=int, default=10, help="number \
                         of classes")

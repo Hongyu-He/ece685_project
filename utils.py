@@ -101,6 +101,9 @@ def average_weights(w):
 def exp_details(args):
     print('\nExperimental details:')
     print(f'    Model     : {args.model}')
+    print(f'    Fed Algo  : {args.fed}')
+    if args.fed == 'fedprox':
+        print(f'    Mu        : {args.mu}')
     print(f'    Optimizer : {args.optimizer}')
     print(f'    Learning  : {args.lr}')
     print(f'    Global Rounds   : {args.epochs}\n')
