@@ -75,7 +75,7 @@ if __name__ == '__main__':
         local_model = LocalUpdate(args=args, dataset=train_dataset,
                                  idxs=train_inds)
         w, loss = local_model.baseline_update_weights(
-            model=base_model, global_round=epoch)
+            model=base_model, baseline_round=epoch)
 
         # Update weights
         base_model.load_state_dict(w)
