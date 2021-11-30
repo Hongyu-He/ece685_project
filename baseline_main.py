@@ -34,15 +34,24 @@ if __name__ == '__main__':
         data_dir=args.data_dir, dataset=args.dataset,
         num_users=1, iid=1
     )
-    # Train on 1/5 dataset
-    train_dict = sample_iid(train_dataset, 5)  # user_groups - dict
-    train_inds = train_dict[1]  # train subset inds - set
-    test_dict = sample_iid(test_dataset, 5)
-    test_inds = test_dict[1]  # test subset inds - set
+    # # Train on 1/5 dataset
+    # train_dict = sample_iid(train_dataset, 5)  # user_groups - dict
+    # train_inds = train_dict[1]  # train subset inds - set
+    # test_dict = sample_iid(test_dataset, 5)
+    # test_inds = test_dict[1]  # test subset inds - set
+    # train_subset = DatasetSplit(train_dataset, train_inds)
+    # test_subset = DatasetSplit(test_dataset, test_inds)
+    # print(f'1/5 Training set size: {len(train_subset)}')
+    # print(f'1/5 Testing set size: {len(test_subset)}')
+    # Train on full dataset
+    train_dict = sample_iid(train_dataset, 1)  # user_groups - dict
+    train_inds = train_dict[0]  # train subset inds - set
+    test_dict = sample_iid(test_dataset, 1)
+    test_inds = test_dict[0]  # test subset inds - set
     train_subset = DatasetSplit(train_dataset, train_inds)
     test_subset = DatasetSplit(test_dataset, test_inds)
-    print(f'1/5 Training set size: {len(train_subset)}')
-    print(f'1/5 Testing set size: {len(test_subset)}')
+    print(f'Full training set size: {len(train_subset)}')
+    print(f'Full testing set size: {len(test_subset)}')
 
     # Build model
     if args.model == 'resnext':
